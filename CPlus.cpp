@@ -3,76 +3,106 @@ using namespace std;
 
 int n,m;
 const int Max = 1000;
-vector<int> isVisited(Max);
-vector<int> dist(Max);
+vector<int>dist(Max);
+vector<int>visited(Max);
+vector<int>parent(Max);
+int is_negative_cyclic= -1;
 
-void BFS_traversal(vector<vector<pair<int,int>>>nodes,int src){
-   queue<int> q;
-   q.push(src);
-   isVisited[src] = 1;
-   dist[src] = 0;
-   while (q.size())
+void bellman_ford(vector<vector<pair<int,int>>> list,int src){
+   for (int i = 0; i <= n; i++)
    {
-      int head = q.front();
-      vector<pair<int,int>> intermediate = nodes[head];
-      q.pop();
-      for (int i = 0; i < intermediate.size(); i++)
+      for (int nodes = 0; nodes < n; nodes++)
       {
-         if (isVisited[intermediate[i].first]==0)
+         for (pair<int, int> pr : list[nodes])
          {
-            isVisited[intermediate[i].first]=1;
-            q.push(intermediate[i].first);
-            dist[intermediate[i].first] = dist[head]+intermediate[i].second;
-         }else{
-            int d = dist[intermediate[i].first];
-            if (d > dist[head] + intermediate[i].second){
-               dist[intermediate[i].first] = dist[head] + intermediate[i].second;
+            int totalCost = dist[nodes] + pr.second;
+            if (dist[pr.first] > totalCost)
+            {
+               if(i==n){
+                  is_negative_cyclic = pr.first;
+               }
+               parent[pr.first] = nodes;
+               dist[pr.first] = totalCost;
             }
          }
       }
       
+      
    }
-   
    
 }
 
 int main()
 {
    cin>>n>>m;
-   vector<vector<pair<int,int>>> SSSPNodes(n+1);
-
-   for (int i = 1; i <= m; i++)
+   vector<vector<pair<int,int>>> adj_list(n+1);
+   int src =0;
+   for (int i = 0; i < m; i++)
    {
-      int first, second,third;
-      cin >> first >> second>>third;
-      SSSPNodes[first].push_back({second,third});
-      SSSPNodes[second].push_back({first,third});
+      int x,y,v;
+      cin>>x>>y>>v;
+      adj_list[x].push_back({y,v});
+      // adj_list[y].push_back({x,v});
+      dist[i] = 1e8;
    }
-   BFS_traversal(SSSPNodes,5);
-
-   for (int i = 1; i <=n; i++)
-   {
-      cout<<i<<"="<<dist[i]<<"\n";
+   dist[src] = 0;
+   parent[src]=-1;
+   bellman_ford(adj_list,src);
+   if (is_negative_cyclic!=-1){
+      cout<<"Negative cycle exist"<<is_negative_cyclic;
+      int newOne = is_negative_cyclic;
+      while(true){
+         newOne = parent[newOne];
+         cout << newOne << "<-";
+         if(newOne==is_negative_cyclic){
+            break;
+         }
+      }
+   }else{
+      for (int i = 0; i < n; i++)
+      {
+         cout << i << "= " << dist[i] << " parent= " << parent[i] << "\n";
+      }
    }
+      
    
-  
    return 0;
 }
+
 /**
- * input
-9 14
-1 2 4
-1 8 8
-2 8 11
-2 3 8
-8 9 7
-8 7 1
-3 9 2
-3 4 7
-3 6 4
-9 7 6
-7 6 2
-4 5 9
-4 6 14
-6 5 10
+ *
+ input
+4 4
+0 1 5
+0 2 2
+1 2 1
+1 3 4
+
+5 5
+0 1 5
+1 2 2
+2 3 5
+2 4 -5
+4 2 -3
+
+3 4
+0 1 1
+0 2 -3
+1 2 1
+2 1 2
+
+5 5
+3 2 3
+2 4 2
+4 1 4
+1 2 1
+0 4 1
+
+
+4 5
+0 1 1
+1 3 1
+3 2 -2
+2 0 1
+3 0 -3
 **/

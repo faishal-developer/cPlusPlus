@@ -1,3 +1,4 @@
+//signle source shortest path with BFS problem solved by BFS traversal
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -49,7 +50,7 @@ int main()
         SSSPNodes[first].push_back({second, third});
         SSSPNodes[second].push_back({first, third});
     }
-    BFS_traversal(SSSPNodes, 5);
+    BFS_traversal(SSSPNodes, 1);
 
     for (int i = 1; i <= n; i++)
     {
@@ -75,4 +76,11 @@ int main()
 4 5 9
 4 6 14
 6 5 10
+
+
+4 4
+1 2 5
+1 3 2
+2 3 1
+2 4 4
 **/
