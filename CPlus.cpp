@@ -4,67 +4,56 @@ using namespace std;
 int n,m;
 const int Max = 1000;
 vector<int>dist(Max);
-vector<int>visited(Max);
 vector<int>parent(Max);
 int is_negative_cyclic= -1;
 
-void bellman_ford(vector<vector<pair<int,int>>> list,int src){
-   for (int i = 0; i <= n; i++)
+vector<vector<int>> floyed_warshal(vector<vector<int>> matrix){
+   for (int v = 0; v < n; v++)
    {
-      for (int nodes = 0; nodes < n; nodes++)
+      for (int i = 0; i < n; i++)
       {
-         for (pair<int, int> pr : list[nodes])
+         for (int j = 0; j < n; j++)
          {
-            int totalCost = dist[nodes] + pr.second;
-            if (dist[pr.first] > totalCost)
+            if(i==v || j==v)continue;
+            if (matrix[i][j] > matrix[i][v]+matrix[v][j]){
+               matrix[i][j] = matrix[i][v] + matrix[v][j];
+            }
+            if (i == j)
             {
-               if(i==n){
-                  is_negative_cyclic = pr.first;
-               }
-               parent[pr.first] = nodes;
-               dist[pr.first] = totalCost;
+               matrix[i][j] = 0;
             }
          }
       }
-      
-      
    }
+   return matrix;
    
 }
 
 int main()
 {
    cin>>n>>m;
-   vector<vector<pair<int,int>>> adj_list(n+1);
-   int src =0;
+   int value = 1e8;
+   vector<vector<int>> adj_matrix(n,vector<int>(n,value));
+
    for (int i = 0; i < m; i++)
    {
       int x,y,v;
       cin>>x>>y>>v;
-      adj_list[x].push_back({y,v});
-      // adj_list[y].push_back({x,v});
-      dist[i] = 1e8;
+      adj_matrix[x][y] = v;
+
    }
-   dist[src] = 0;
-   parent[src]=-1;
-   bellman_ford(adj_list,src);
-   if (is_negative_cyclic!=-1){
-      cout<<"Negative cycle exist"<<is_negative_cyclic;
-      int newOne = is_negative_cyclic;
-      while(true){
-         newOne = parent[newOne];
-         cout << newOne << "<-";
-         if(newOne==is_negative_cyclic){
-            break;
-         }
-      }
-   }else{
-      for (int i = 0; i < n; i++)
+   cout<<"now see the adjacency_matrix\n";
+   adj_matrix = floyed_warshal(adj_matrix);
+   for (int i = 0; i < n; i++)
+   {
+      for (int j = 0; j < n; j++)
       {
-         cout << i << "= " << dist[i] << " parent= " << parent[i] << "\n";
+         cout<<adj_matrix[i][j]<<" ";
       }
-   }
+      cout<<"\n";
       
+   }
+   
    
    return 0;
 }
